@@ -56,6 +56,9 @@ init([]) ->
   {ok, #state{}}.
 
 -spec handle_cast(any(), state()) -> {noreply, state()}.
+handle_cast({set, CacheName, LifeTime, Key, Val}, State) ->
+  simple_cache:set(CacheName, LifeTime, Key, Val),
+  {noreply, State};
 handle_cast(_Msg, State) ->
   {noreply, State}.
 

@@ -32,6 +32,7 @@
 %%% Public API.
 -export([init/1]).
 -export([get/4]).
+-export([get/2, set/4, async_set/4, cachename/1]).
 -export([flush/1, flush/2]).
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -75,3 +76,29 @@ get(CacheName, LifeTime, Key, FunResult) ->
     [{Key, R}] -> R % Found, return the value.
   end.
 
+%% @doc Tries to lookup Key in the cache
+%% on a miss.
+-spec get(atom(), term()) -> term().
+get(CacheName, Key) ->
+  RealName = ?NAME(CacheName),
+  case ets:lookup(RealName, Key) of
+    [] ->[];
+    [{Key, R}] -> R % Found, return the value.
+  end.
+
+%% @doc Set new item in the cache
+%% on a miss.
+-spec set(atom(), infinity|pos_integer(), term(), term()) -> term().
+set(CacheName, LifeTime, Key, Val) ->
+  RealName = ?NAME(CacheName),
+  ets:insert(RealName, {Key, Val}),
+  erlang:send_after(LifeTime, simple_cache_expirer, {expire, CacheName, Key}),
+  ok.
+
+async_set(CacheName, LifeTime, Key, Val) ->
+  gen_server:cast(simple_cache_expirer, {set, CacheName, LifeTime, Key, Val}).
+
+%% @doc return the cache name
+-spec cachename(atom()) -> term().
+cachename(CacheName) ->
+  ?NAME(CacheName).
