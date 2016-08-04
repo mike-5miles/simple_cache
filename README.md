@@ -23,9 +23,22 @@ a MISS will call the given **fun**, caching its result for **3600000** milliseco
 
     simple_cache:get(my_cache_name, 3600000, my_key, fun() ->
         io:format("This fun will be called on a cache miss~n"),
-        timer:sleep(5000)
+        timer:sleep(5000),
         this_value_will_be_cached
     end)
+
+Just get:
+
+    simple_cache:get(my_cache_name,my_key).   
+
+## Setting a Key
+Set a key and value sync:
+
+    simple_cache:set(my_cache_name, 3600000, my_key, ok).
+
+Set a key and value async:
+
+    simple_cache:async_set(my_cache_name, 3600000, my_key, ok).    
 
 ## Flushing the cache
 
