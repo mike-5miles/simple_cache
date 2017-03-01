@@ -32,7 +32,7 @@
 %%% Public API.
 -export([init/1]).
 -export([get/4]).
--export([get/2, set/4, async_set/4, cachename/1]).
+-export([get/2, set/4, async_set/4, cachename/1, exist/2]).
 -export([flush/1, flush/2]).
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -102,3 +102,9 @@ async_set(CacheName, LifeTime, Key, Val) ->
 -spec cachename(atom()) -> term().
 cachename(CacheName) ->
   ?NAME(CacheName).
+  
+%% @doc check a key exists or not.
+-spec exist(atom(), term()) -> boolean.
+exist(CacheName, Key) ->
+  RealName = ?NAME(CacheName),
+  ets:member(RealName, Key).
